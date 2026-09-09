@@ -1,0 +1,16 @@
+node_modules/
+site/
+*.log
+
+# ⚠ CSV fica FORA de propósito. A entrada natural deste projeto é extração de
+#   produção, e um "git add ." distraído basta para publicar dado de cliente.
+#   A demonstração é a exceção, porque ela é gerada e inventada.
+*.csv
+!dados/exemplo.csv
+
+# saída de página fora de docs/
+*.html
+!docs/index.html
+
+# cópias temporárias usadas para tirar as fotos do README
+docs/_*.html

@@ -1,0 +1,18 @@
+{
+  "name": "tabela-eficiencia-banco",
+  "version": "1.0.0",
+  "description": "Tabela de eficiencia por lugar e por categoria em que clicar numa celula responde para onde apontar: a categoria, o lugar, os dois, ou nenhum dos dois.",
+  "license": "MIT",
+  "author": "Matheus da Silva Barros",
+  "main": "src/logica.js",
+  "files": ["src", "config.json", "README.md", "LICENSE"],
+  "scripts": {
+    "demo": "node scripts/gera-demo.js",
+    "teste": "node teste/testa.js",
+    "pagina": "node scripts/gera-pagina.js",
+    "tudo": "node scripts/gera-demo.js && node teste/testa.js && node scripts/gera-pagina.js"
+  },
+  "keywords": ["heatmap", "matriz", "eficiencia", "analise", "dataviz", "react", "portugues"],
+  "repository": { "type": "git", "url": "https://github.com/TheuSilva/tabela-eficiencia-banco.git" },
+  "homepage": "https://theusilva.github.io/tabela-eficiencia-banco/"
+}

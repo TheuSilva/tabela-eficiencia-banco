@@ -1,0 +1,36 @@
+{
+  "titulo": "O tempo por estado e por banco",
+  "legenda": "Dias entre a entrada do processo e a decisão. Clique numa célula para o recado.",
+  "matriz": {
+    "minN": 5,
+    "topCols": 10,
+    "minCol": 20,
+    "rotTotal": "TOTAL"
+  },
+  "voc": {
+    "total": "o país",
+    "totalArt": "O país",
+    "totalDe": "do país",
+    "totalEm": "no país inteiro",
+    "unidade": "dias",
+    "categoria": "banco",
+    "catFem": false,
+    "niveis": [
+      { "nome": "estado", "art": "o", "plural": "estados", "fem": false },
+      { "nome": "comarca", "art": "a", "plural": "comarcas", "fem": true },
+      { "nome": "vara", "art": "a", "plural": "varas", "fem": true }
+    ],
+    "nomes": {
+      "SA": ["Serra Alta", "da"],
+      "VN": ["Vale do Norte", "do"],
+      "CV": ["Campo Verde", "do"],
+      "LS": ["Litoral Sul", "do"],
+      "PN": ["Planalto Norte", "do"],
+      "MR": ["Monte Rubro", "do"],
+      "TB": ["Terra Boa", "da"],
+      "BC": ["Baía Clara", "da"],
+      "IL": ["Ilha Longa", "da"],
+      "SD": ["Sertão Dourado", "do"]
+    }
+  }
+}
