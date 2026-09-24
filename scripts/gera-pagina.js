@@ -22,6 +22,8 @@ const m = MG.montaMatriz(registros, cfg.matriz || {});
 ['logica.js', 'matriz.jsx', 'estilo.css'].forEach((f) => {
   fs.copyFileSync(path.join(raiz, 'src', f), path.join(docs, f));
 });
+// a base vai junto, mas a página só a busca quando alguém clica em baixar um recorte
+fs.copyFileSync(path.join(raiz, 'dados', 'exemplo.csv'), path.join(docs, 'exemplo.csv'));
 
 fs.writeFileSync(path.join(docs, 'dados-demo.js'),
   'window.DEMO = ' + JSON.stringify({ matriz: m, voc: cfg.voc, titulo: cfg.titulo, legenda: cfg.legenda })
@@ -62,7 +64,8 @@ const html = `<!doctype html>
 <script type="text/babel" data-presets="react">
 ReactDOM.createRoot(document.getElementById('raiz')).render(
   <Matriz m={window.DEMO.matriz} voc={window.DEMO.voc}
-    titulo={window.DEMO.titulo} legenda={window.DEMO.legenda} />
+    titulo={window.DEMO.titulo} legenda={window.DEMO.legenda}
+    registros={() => fetch('exemplo.csv').then((r) => r.text()).then(MG.leCsv)} />
 );
 </script>
 </body>

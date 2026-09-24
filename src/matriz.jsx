@@ -49,7 +49,7 @@ function Frase({ partes }) {
 }
 
 // O quadro: a leitura da célula em uma frase, e embaixo onde ela mora.
-function Quadro({ rec, casc, voc, metrica, pai, onIr, onFechar }) {
+function Quadro({ rec, casc, voc, metrica, pai, onIr, onFechar, onBaixar }) {
   React.useEffect(() => {
     const h = (e) => { if (e.key === 'Escape') onFechar(); };
     window.addEventListener('keydown', h);
@@ -77,7 +77,12 @@ function Quadro({ rec, casc, voc, metrica, pai, onIr, onFechar }) {
                 + ' (' + MG.num(rec.valLinha) + ')' : ''}
             </div>
           </div>
-          <button className="g-fechar" onClick={onFechar} aria-label="Fechar">×</button>
+          {/* o × fica no topo e o download do recorte logo abaixo dele */}
+          <div className="g-quadro-acoes">
+            <button className="g-fechar" onClick={onFechar} aria-label="Fechar">×</button>
+            {onBaixar && <button className="g-baixar" onClick={onBaixar}
+              title={'Só os registros de ' + rec.lugar + ' · ' + rec.categoria}>↓ CSV do recorte</button>}
+          </div>
         </div>
         <div className="g-quadro-b">
           <p className="g-rot">O recado</p>
@@ -161,9 +166,23 @@ function Quadro({ rec, casc, voc, metrica, pai, onIr, onFechar }) {
   );
 }
 
+// Entrega um texto como arquivo, sem servidor.
+function baixaArquivo(nome, texto) {
+  const url = URL.createObjectURL(new Blob([texto], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = nome;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 // A matriz. Hierarquia recolhível, ranking pelo cabeçalho e a célula que abre o
 // quadro.
-function Matriz({ m, voc, titulo, legenda }) {
+//
+// `registros` é opcional: um array { lugar, categoria, valor } ou uma função que
+// devolve (ou promete) esse array. Com ele, o quadro ganha o botão que baixa só
+// os registros da célula aberta. A função existe para a página não carregar a
+// base inteira antes de alguém pedir.
+function Matriz({ m, voc, titulo, legenda, registros }) {
   const [abertos, setAbertos] = React.useState({});
   const [ord, setOrd] = React.useState({ k: null, d: -1 });
   const [metrica, setMetrica] = React.useState('mediana');
@@ -345,6 +364,12 @@ function Matriz({ m, voc, titulo, legenda }) {
         pai={m.linhas[sel.i].pai >= 0 && m.linhas[sel.i].pai !== sel.i
           ? { i: m.linhas[sel.i].pai, rot: m.linhas[m.linhas[sel.i].pai].rot } : null}
         onIr={(i) => setSel({ i: i, j: sel.j })}
+        onBaixar={registros ? () => {
+          Promise.resolve(typeof registros === 'function' ? registros() : registros)
+            .then((regs) => baixaArquivo(MG.nomeDoRecorte(m, sel.i, sel.j),
+              MG.csvDe(MG.registrosDaCelula(regs, m, sel.i, sel.j))))
+            .catch((e) => alert('Não deu para montar o recorte: ' + e.message));
+        } : null}
         onFechar={() => setSel(null)} />}
     </div>
   );

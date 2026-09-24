@@ -524,7 +524,58 @@
     return out;
   }
 
+  // --------------------------------------------------------------------------
+  // registrosDaCelula — os registros que formam a célula (i, j) de uma matriz.
+  // É o que o botão de download do quadro baixa: o lugar da linha (a cadeia de
+  // níveis até ela) e a categoria da coluna.
+  //
+  // ⚠ A última coluna é "quem não virou coluna", mesmo quando leva o NOME de uma
+  //   categoria só (rotOutros): filtrar pelo rótulo erraria no dia em que sobrarem
+  //   duas. A lista de colunas é a própria matriz que diz.
+  // ⚠ A contagem TEM de bater com cel[0] da célula; a suíte cobra isso em todas.
+  // --------------------------------------------------------------------------
+  function caminhoDaLinha(m, i) {
+    var cam = [];
+    for (var k = i; k > 0; k = m.linhas[k].pai) cam[m.linhas[k].niv] = m.linhas[k].rot;
+    return cam;
+  }
+
+  function registrosDaCelula(registros, m, i, j) {
+    if (!m || !m.linhas || !m.linhas[i]) return [];
+    var cam = caminhoDaLinha(m, i);
+    var cols = m.cols || [];
+    return (registros || []).filter(function (r) {
+      for (var n = 0; n < cam.length; n++) if (r.lugar[n] !== cam[n]) return false;
+      if (!j) return true;
+      if (j <= cols.length) return r.categoria === cols[j - 1];
+      return cols.indexOf(r.categoria) < 0;
+    }).sort(function (a, b) { return b.valor - a.valor; });
+  }
+
+  // CSV no MESMO formato que leCsv lê: o recorte baixado volta para a tabela sem
+  // conversão. O BOM é para o Excel abrir os acentos certos.
+  function csvDe(registros) {
+    var q = function (s) { return /[;"\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+    var linhas = ['NIVEL1;NIVEL2;NIVEL3;CATEGORIA;VALOR'];
+    (registros || []).forEach(function (r) {
+      linhas.push([r.lugar[0] || '', r.lugar[1] || '', r.lugar[2] || '', r.categoria, String(r.valor)]
+        .map(function (s) { return q(String(s)); }).join(';'));
+    });
+    return '﻿' + linhas.join('\r\n') + '\r\n';
+  }
+
+  // nome de arquivo sem acento nem espaço: recorte_SA_Alto_Rubro_Banco_Aurora.csv
+  function nomeDoRecorte(m, i, j) {
+    var cols = m.cols || [];
+    var cat = !j ? '' : (j <= cols.length ? cols[j - 1] : 'Outros');
+    var txt = caminhoDaLinha(m, i).concat(cat ? [cat] : []).join('_')
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 80);
+    return 'recorte_' + (txt || 'TOTAL') + '.csv';
+  }
+
   var MG = {
+    registrosDaCelula: registrosDaCelula, csvDe: csvDe, nomeDoRecorte: nomeDoRecorte,
     CORTES: CORTES, FORA_DA_CURVA: FORA_DA_CURVA, MIN_COMPARA: MIN_COMPARA,
     VOC_PADRAO: VOC_PADRAO,
     faixa: faixa, mediana: mediana, media: media,

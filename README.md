@@ -54,6 +54,11 @@ puxa o número daquela célula, e uma frase que separa dois casos muito diferent
 *"as piores não explicam o número, o resto está espalhado"*. Cada linha da lista é clicável
 e abre o mesmo recado um nível abaixo.
 
+No topo do quadro, embaixo do ×, o botão **CSV do recorte** baixa só os registros daquela
+célula: o lugar da linha e o banco da coluna (na coluna *Todos*, o lugar inteiro). O arquivo
+sai do mais demorado para o mais rápido, no mesmo formato de entrada, então dá para abrir no
+Excel ou devolver para a tabela, e a quantidade de linhas é sempre a que a célula mostra.
+
 ## As decisões que fazem a frase valer
 
 Estão aqui porque cada uma nasceu de uma leitura errada que a versão anterior produzia.
@@ -91,7 +96,7 @@ regra a comarca de um processo só vira a "melhor do país" no primeiro clique d
 
 ```bash
 node scripts/gera-demo.js            # dados fictícios em dados/exemplo.csv
-node teste/testa.js                  # 49 verificações, sem navegador
+node teste/testa.js                  # 55 verificações, sem navegador
 node scripts/gera-pagina.js          # monta docs/ (é o que o GitHub Pages serve)
 ```
 
@@ -113,6 +118,15 @@ Na página:
 <script type="text/babel">
   ReactDOM.createRoot(alvo).render(<Matriz m={matriz} voc={voc} titulo="..." />);
 </script>
+```
+
+Para o quadro ganhar o botão de download, passe também `registros`: o array que montou a
+matriz, ou uma função que o devolva (ou prometa). A função é para a página só buscar a base
+quando alguém pedir o recorte, que é como a demo faz:
+
+```jsx
+<Matriz m={matriz} voc={voc}
+  registros={() => fetch('exemplo.csv').then((r) => r.text()).then(MG.leCsv)} />
 ```
 
 Não há build: o React vem por CDN e o Babel transpila no navegador, que é o mesmo caminho da
@@ -137,7 +151,7 @@ src/matriz.jsx      o componente React
 src/estilo.css      tokens e layout, tema claro e escuro pelo ajuste do sistema
 scripts/gera-demo.js    dados fictícios determinísticos
 scripts/gera-pagina.js  monta docs/ para o GitHub Pages
-teste/testa.js      49 verificações, sem navegador
+teste/testa.js      55 verificações, sem navegador
 ```
 
 ## Licença

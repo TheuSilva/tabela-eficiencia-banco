@@ -150,6 +150,34 @@ const rMean = MG.recado(m, iLugar('MR'), 0, { iVal: 2, voc: VOC });
 conf('mediana e média dão números diferentes', rMed.val !== rMean.val, rMed.val + ' x ' + rMean.val);
 conf('e a razão é recalculada junto', rMed.razao !== rMean.razao);
 
+console.log('download do recorte');
+// ⚠ a promessa do botão: o arquivo tem EXATAMENTE os registros que a célula conta
+let nCel = 0, divergem = 0;
+m.linhas.forEach((l, i) => l.cel.forEach((c, j) => {
+  if (!c) return;
+  nCel++;
+  if (MG.registrosDaCelula(registros, m, i, j).length !== c[0]) divergem++;
+}));
+conf('toda célula baixa a quantidade que mostra', divergem === 0, divergem + ' de ' + nCel);
+const jOut = cols.length - 1;
+if (m.outros) {
+  const rOut = MG.registrosDaCelula(registros, m, 0, jOut);
+  conf('a coluna Outros baixa só quem não virou coluna',
+    rOut.length > 0 && rOut.every((r) => m.cols.indexOf(r.categoria) < 0));
+}
+const rSA = MG.registrosDaCelula(registros, m, iLugar('SA'), jCat('Crediluz'));
+conf('o recorte fica no lugar e na categoria da célula',
+  rSA.length > 0 && rSA.every((r) => r.lugar[0] === 'SA' && r.categoria === 'Crediluz'));
+conf('e sai do mais demorado para o mais rápido',
+  rSA.every((r, k) => !k || rSA[k - 1].valor >= r.valor));
+const volta = MG.leCsv(MG.csvDe(rSA));
+conf('o CSV baixado volta pelo leCsv sem perder nada',
+  volta.length === rSA.length && volta.every((r, k) => r.valor === rSA[k].valor
+    && r.categoria === rSA[k].categoria && r.lugar.join('|') === rSA[k].lugar.join('|')));
+conf('o nome do arquivo não leva acento nem espaço',
+  /^recorte_[A-Za-z0-9_]+\.csv$/.test(MG.nomeDoRecorte(m, iLugar('SA'), jCat('Crediluz'))),
+  MG.nomeDoRecorte(m, iLugar('SA'), jCat('Crediluz')));
+
 console.log('');
 console.log(ok + ' verificações passaram, ' + ruim + ' falharam');
 process.exit(ruim ? 1 : 0);

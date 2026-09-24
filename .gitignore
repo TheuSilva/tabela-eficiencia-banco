@@ -7,6 +7,8 @@ site/
 #   A demonstração é a exceção, porque ela é gerada e inventada.
 *.csv
 !dados/exemplo.csv
+# a cópia que a página do Pages busca para o botão de download do recorte
+!docs/exemplo.csv
 
 # saída de página fora de docs/
 *.html
